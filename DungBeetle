@@ -1,0 +1,41 @@
+class RollDung(Behavior):
+    def determine(self, entity: "DungBeetle", env: "Env") -> bool:
+        return env.has_dung_nearby(entity) and not entity.is_rolling
+
+    def act(self, entity: "DungBeetle", env: "Env"):
+        entity.start_rolling()
+        print(f"쇠똥구리가 배설물을 발견하여 공을 굴리기 시작합니다!")
+
+class EatDung(Behavior):
+    def determine(self, entity: "DungBeetle", env: "Env") -> bool:
+        return entity.is_rolling and entity.ball_size >= 10
+
+    def act(self, entity: "DungBeetle", env: "Env"):
+        entity.eat_dung()
+        print("공 크기가 충분하여 쇠똥구리가 섭취합니다.")
+
+Python
+from base import Entity, Behavior
+
+class DungBeetle(Entity):
+    def __init__(self):
+        self.is_rolling = False
+        self.ball_size = 0
+
+        self.fullness = 100 
+
+    def behaviors(self) -> list["Behavior"]:
+        return [RollDung(), EatDung()]
+
+    def start_rolling(self):
+        self.is_rolling = True
+        self.ball_size += 1 # 굴릴수록 커짐
+
+    def eat_dung(self):
+        self.fullness += 20
+        self.is_rolling = False
+        self.ball_size = 0
+        print("쇠똥구리가 배설물을 완전히 처리했습니다.")
+
+    def move(self): pass
+    def produce_dung(self): pass
