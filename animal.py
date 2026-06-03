@@ -15,8 +15,9 @@ class Animal(Entity):
     # --- 종별 기본값 (서브클래스에서 재정의) ---
     species = "animal"
     color = (220, 220, 220)
-    diet = "herbivore"          # herbivore / carnivore / scavenger / detritivore
     base_speed = 2.0            # 이동 속도 (타일/초)
+    # 식성은 별도 속성이 아니라 build_behaviors()가 어떤 먹이활동 Behavior 하위 클래스를
+    # 포함하느냐로 표현된다 (Hunt=육식, SeekPlantFood=초식, Scavenge=청소, RollDung=분식).
     size = 1.0                  # 몸집 (사냥 시 영양가, 충돌 판정)
     detection_range = 6.0       # 주변 인지 범위 (타일)
     fly = False                 # 비행 가능 여부

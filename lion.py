@@ -30,7 +30,6 @@ class Roar(Behavior):
 class Lion(Animal):
     species = "lion"
     color = (200, 150, 70)
-    diet = "carnivore"
     base_speed = 2.4
     size = 3.0
     detection_range = 9.0

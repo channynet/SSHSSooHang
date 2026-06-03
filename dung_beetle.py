@@ -37,7 +37,6 @@ class EatDung(Behavior):
 class DungBeetle(Animal):
     species = "dung_beetle"
     color = (60, 60, 70)
-    diet = "detritivore"
     base_speed = 1.0
     size = 0.3
     detection_range = 9.0

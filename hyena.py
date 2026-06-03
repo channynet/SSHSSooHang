@@ -53,7 +53,6 @@ class Scavenge(Behavior):
 class Hyena(Animal):
     species = "hyena"
     color = (160, 140, 90)
-    diet = "carnivore"
     base_speed = 2.3
     size = 1.5
     detection_range = 8.0

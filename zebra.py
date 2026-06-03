@@ -9,7 +9,6 @@ from behaviors import ProduceDung, Flee, SeekWater, SeekPlantFood, Breed, Wander
 class Zebra(Animal):
     species = "zebra"
     color = (225, 225, 230)
-    diet = "herbivore"
     base_speed = 2.5
     size = 2.0
     detection_range = 7.0

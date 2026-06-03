@@ -30,7 +30,6 @@ class Trample(Behavior):
 class Elephant(Animal):
     species = "elephant"
     color = (140, 130, 150)
-    diet = "herbivore"
     base_speed = 1.3
     size = 5.0
     detection_range = 6.0

@@ -8,7 +8,6 @@ from behaviors import ProduceDung, Hunt, SeekWater, Breed, Wander
 class Cheetah(Animal):
     species = "cheetah"
     color = (210, 170, 60)
-    diet = "carnivore"
     base_speed = 2.6
     size = 1.2
     detection_range = 8.0

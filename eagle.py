@@ -7,7 +7,6 @@ from behaviors import ProduceDung, Hunt, SeekWater, Breed, Wander
 class Eagle(Animal):
     species = "eagle"
     color = (90, 70, 50)
-    diet = "carnivore"
     base_speed = 3.6        # 비행: 타일 간 빠르게 이동
     size = 1.0
     detection_range = 10.0  # 비행 중 넓은 시야

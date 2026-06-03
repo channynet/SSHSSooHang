@@ -9,7 +9,6 @@ JUMP_COOLDOWN = 3.0
 class Rabbit(Animal):
     species = "rabbit"
     color = (235, 235, 240)
-    diet = "herbivore"
     base_speed = 2.2
     size = 0.4
     detection_range = 7.0
