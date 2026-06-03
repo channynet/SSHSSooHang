@@ -11,12 +11,16 @@ ROAR_COOLDOWN = 10.0
 class Roar(Behavior):
     """포효(skill): 주변 사냥감의 스태미나를 깎아 도주를 어렵게 만든다."""
 
+    def __init__(self, target_classes):
+        # 포효가 영향을 줄 사냥감 Animal 하위 클래스들 (isinstance용 튜플)
+        self.target_classes = tuple(target_classes)
+
     def determine(self, e, env) -> bool:
         if e.skill_timer > 0.0:
             return False
         e._roar_targets = env.animals_near(
             e.location, e.detection_range,
-            lambda a: a.species in e.prey,
+            lambda a: isinstance(a, self.target_classes),
         )
         return len(e._roar_targets) > 0
 
@@ -34,7 +38,10 @@ class Lion(Animal):
     size = 3.0
     detection_range = 9.0
     stealth_rate = 0.9     # ambush: 은폐율 (사냥감 회피 확률을 낮춤)
-    prey = ("zebra", "hyena")   # 얼룩말 사냥 + 하이에나 추격
 
     def build_behaviors(self) -> list:
-        return [ProduceDung(), SeekWater(), Hunt(), Roar(), Breed(), Wander()]
+        from zebra import Zebra
+        from hyena import Hyena
+        # 얼룩말 사냥 + 하이에나 추격
+        return [ProduceDung(), SeekWater(), Hunt(target_classes=[Zebra, Hyena]),
+                Roar(target_classes=[Zebra, Hyena]), Breed(), Wander()]

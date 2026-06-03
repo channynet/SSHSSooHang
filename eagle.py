@@ -11,7 +11,6 @@ class Eagle(Animal):
     size = 1.0
     detection_range = 10.0  # 비행 중 넓은 시야
     fly = True
-    prey = ("rabbit",)
 
     def __init__(self, location, gender=None):
         super().__init__(location, gender)
@@ -23,4 +22,5 @@ class Eagle(Animal):
         return 1.8
 
     def build_behaviors(self) -> list:
-        return [ProduceDung(), SeekWater(), Hunt(), Breed(), Wander()]
+        from rabbit import Rabbit
+        return [ProduceDung(), SeekWater(), Hunt(target_classes=[Rabbit]), Breed(), Wander()]

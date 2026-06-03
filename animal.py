@@ -21,8 +21,6 @@ class Animal(Entity):
     size = 1.0                  # 몸집 (사냥 시 영양가, 충돌 판정)
     detection_range = 6.0       # 주변 인지 범위 (타일)
     fly = False                 # 비행 가능 여부
-    prey = ()                   # 사냥 대상 종 이름들
-    predators = ()              # 두려워하는 포식자 종 이름들
     max_body_water = 100.0
     max_fullness = 100.0
     max_stamina = 100.0

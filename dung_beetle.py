@@ -40,7 +40,6 @@ class DungBeetle(Animal):
     base_speed = 1.0
     size = 0.3
     detection_range = 9.0
-    predators = ("elephant",)   # 짓밟힘 → 도망
 
     def __init__(self, location, gender=None):
         super().__init__(location, gender)
@@ -64,4 +63,5 @@ class DungBeetle(Animal):
         print("공 크기가 충분하여 쇠똥구리가 섭취했습니다.")
 
     def build_behaviors(self) -> list:
-        return [Flee(), SeekWater(), EatDung(), RollDung(), Breed(), Wander()]
+        from elephant import Elephant
+        return [Flee(target_classes=[Elephant]), SeekWater(), EatDung(), RollDung(), Breed(), Wander()]

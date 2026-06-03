@@ -8,12 +8,16 @@ from dead_body import DeadBody
 
 
 class Trample(Behavior):
-    """passive: 발밑에 들어온 쇠똥구리/토끼를 짓밟는다 (토끼는 jump로 회피 가능)."""
+    """passive: 발밑에 들어온 주어진 종(쇠똥구리/토끼)을 짓밟는다 (토끼는 jump로 회피 가능)."""
+
+    def __init__(self, target_classes):
+        # 짓밟을 Animal 하위 클래스들 (isinstance용 튜플)
+        self.target_classes = tuple(target_classes)
 
     def determine(self, e, env) -> bool:
         victim = env.nearest_animal(
             e.location, config.INTERACT_RADIUS,
-            lambda a: a.species in ("dung_beetle", "rabbit"),
+            lambda a: isinstance(a, self.target_classes),
         )
         e._victim = victim
         return victim is not None
@@ -35,4 +39,7 @@ class Elephant(Animal):
     detection_range = 6.0
 
     def build_behaviors(self) -> list:
-        return [ProduceDung(), SeekWater(), Trample(), SeekPlantFood(), Breed(), Wander()]
+        from dung_beetle import DungBeetle
+        from rabbit import Rabbit
+        return [ProduceDung(), SeekWater(), Trample(target_classes=[DungBeetle, Rabbit]),
+                SeekPlantFood(), Breed(), Wander()]

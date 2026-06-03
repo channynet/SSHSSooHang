@@ -19,7 +19,7 @@ from zebra import Zebra
 # 종별 초기 개체 수 (먹이사슬 균형용)
 POPULATION = {
     Zebra: 12,
-    Rabbit: 12,      # 50x34 그리드에서 2분 내 붕괴 보장용으로 축소 (16→12)
+    Rabbit: 12,  # 50x34 그리드에서 2분 내 붕괴 보장용으로 축소 (16→12)
     Elephant: 4,
     DungBeetle: 8,
     Lion: 3,
@@ -31,8 +31,10 @@ POPULATION = {
 
 def _build_grid(rng: random.Random) -> list[list[Tile]]:
     # 기본은 육지
-    grid = [[Tile(x, y, TileType.LAND) for x in range(config.GRID_W)]
-            for y in range(config.GRID_H)]
+    grid = [
+        [Tile(x, y, TileType.LAND) for x in range(config.GRID_W)]
+        for y in range(config.GRID_H)
+    ]
 
     # 물 웅덩이 몇 개 배치
     for _ in range(4):
@@ -67,7 +69,7 @@ def build_env(seed: int | None = None) -> Env:
     animals = []
     for species_cls, count in POPULATION.items():
         for i in range(count):
-            gender = "M" if i % 2 == 0 else "F"   # 번식을 위해 성별 균형 보장
+            gender = "M" if i % 2 == 0 else "F"  # 번식을 위해 성별 균형 보장
             animals.append(species_cls(_random_land_point(grid, rng), gender))
     env.populate(animals)
     return env

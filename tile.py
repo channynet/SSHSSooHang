@@ -41,7 +41,9 @@ class Tile:
 
     def increase_water(self, dt_sec: float) -> None:
         if self.kind == TileType.WATER:
-            self.water = min(config.WATER_TILE_MAX, self.water + config.RAIN_WATER_GAIN * dt_sec)
+            self.water = min(
+                config.WATER_TILE_MAX, self.water + config.RAIN_WATER_GAIN * dt_sec
+            )
 
     def grow_plants(self, dt_sec: float, rainy: bool) -> None:
         if self.kind == TileType.PLANT:

@@ -5,6 +5,7 @@ from tile import TileType
 
 try:
     import pygame
+
     HEADLESS = False
 except ImportError:  # pragma: no cover - 환경에 pygame이 없을 때
     pygame = None
@@ -118,9 +119,17 @@ def _draw_collapse(env) -> None:
     overlay.fill((0, 0, 0))
     _screen.blit(overlay, (0, 0))
     msg = _big_font.render("생태계 붕괴", True, (240, 80, 80))
-    _screen.blit(msg, msg.get_rect(center=(_screen.get_width() // 2, _screen.get_height() // 2 - 20)))
+    _screen.blit(
+        msg,
+        msg.get_rect(center=(_screen.get_width() // 2, _screen.get_height() // 2 - 20)),
+    )
     reason = _font.render(env.collapse_reason, True, (230, 230, 230))
-    _screen.blit(reason, reason.get_rect(center=(_screen.get_width() // 2, _screen.get_height() // 2 + 20)))
+    _screen.blit(
+        reason,
+        reason.get_rect(
+            center=(_screen.get_width() // 2, _screen.get_height() // 2 + 20)
+        ),
+    )
 
 
 def _blit(text, x, y, color) -> None:
@@ -131,7 +140,7 @@ def _blit(text, x, y, color) -> None:
 def _draw_headless(env) -> bool:
     global _headless_timer
     _headless_timer += config.MS_PER_FRAME
-    if _headless_timer >= 1000:   # 1초마다 요약 출력
+    if _headless_timer >= 1000:  # 1초마다 요약 출력
         _headless_timer = 0.0
         counts = env.species_counts()
         summary = "  ".join(f"{s}:{n}" for s, n in sorted(counts.items()))

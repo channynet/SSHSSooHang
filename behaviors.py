@@ -14,7 +14,9 @@ def _heading_target(e, env) -> Point:
     if not hasattr(e, "_wander_angle") or e._wander_t > 2.0:
         e._wander_angle = random.uniform(0.0, 2 * math.pi)
         e._wander_t = 0.0
-    direction = Point(math.cos(e._wander_angle), math.sin(e._wander_angle)) - Point(0.0, 0.0)
+    direction = Point(math.cos(e._wander_angle), math.sin(e._wander_angle)) - Point(
+        0.0, 0.0
+    )
     return env.clamp(e.location + direction * 4.0)
 
 
@@ -29,14 +31,19 @@ class ProduceDung(Behavior):
 
 
 class Flee(Behavior):
-    """포식자가 인지 범위에 들어오면 반대 방향으로 도망친다."""
+    """주어진 포식자 클래스가 인지 범위에 들어오면 반대 방향으로 도망친다."""
+
+    def __init__(self, target_classes):
+        # 두려워하는 포식자 Animal 하위 클래스들 (isinstance용 튜플)
+        self.target_classes = tuple(target_classes)
 
     def determine(self, e, env) -> bool:
-        if not e.predators:
+        if not self.target_classes:
             return False
         threat = env.nearest_animal(
-            e.location, e.detection_range,
-            lambda a: a.species in e.predators,
+            e.location,
+            e.detection_range,
+            lambda a: isinstance(a, self.target_classes),
         )
         e._threat = threat
         return threat is not None
@@ -56,7 +63,10 @@ class SeekWater(Behavior):
         tile = env.nearest_tile(e.location, env.water_tiles)
         if tile is None:
             return
-        if e.location.distance_to(tile.center) < 0.8 or env.tile_at(e.location).has_water():
+        if (
+            e.location.distance_to(tile.center) < 0.8
+            or env.tile_at(e.location).has_water()
+        ):
             e.drink(tile if tile.has_water() else env.tile_at(e.location))
         else:
             e.step_toward(tile.center, env, env._dt)
@@ -79,14 +89,19 @@ class SeekPlantFood(Behavior):
 
 
 class Hunt(Behavior):
-    """포식자가 배고프면 사냥감(e.prey)을 추격해 포식한다."""
+    """포식자가 배고프면 주어진 사냥감 클래스를 추격해 포식한다."""
+
+    def __init__(self, target_classes):
+        # 사냥 대상 Animal 하위 클래스들 (isinstance용 튜플)
+        self.target_classes = tuple(target_classes)
 
     def determine(self, e, env) -> bool:
-        if not e.prey or e.hunger_ratio >= config.HUNGER_THRESHOLD:
+        if not self.target_classes or e.hunger_ratio >= config.HUNGER_THRESHOLD:
             return False
         target = env.nearest_animal(
-            e.location, e.detection_range,
-            lambda a: a.species in e.prey and not a.is_flying,
+            e.location,
+            e.detection_range,
+            lambda a: isinstance(a, self.target_classes) and not a.is_flying,
         )
         e._target = target
         return target is not None
@@ -104,7 +119,11 @@ class Hunt(Behavior):
 
     def capture_succeeds(self, e, target, env) -> bool:
         """사냥감의 회피 능력(점프/은폐 등)을 반영. 기본은 항상 성공."""
-        return target.on_capture_attempt(e, env) if hasattr(target, "on_capture_attempt") else True
+        return (
+            target.on_capture_attempt(e, env)
+            if hasattr(target, "on_capture_attempt")
+            else True
+        )
 
 
 class Breed(Behavior):
@@ -114,8 +133,9 @@ class Breed(Behavior):
         if not e.can_breed():
             return False
         partner = env.nearest_animal(
-            e.location, config.BREED_RADIUS,
-            lambda a: a.species == e.species and a.gender != e.gender and a.can_breed(),
+            e.location,
+            config.BREED_RADIUS,
+            lambda a: type(a) is type(e) and a.gender != e.gender and a.can_breed(),
         )
         e._partner = partner
         # 한 쌍이 두 번 번식하지 않도록 한쪽(F)만 실행한다.

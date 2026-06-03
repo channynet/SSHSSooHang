@@ -7,14 +7,18 @@ from behaviors import ProduceDung, Flee, Hunt, SeekWater, Breed, Wander
 
 
 class StealFood(Behavior):
-    """치타/사자가 비축한 식량을 빼앗는다."""
+    """식량을 비축하는 주어진 종(치타/사자)에게서 식량을 빼앗는다."""
+
+    def __init__(self, target_classes):
+        # 비축 식량을 노릴 Animal 하위 클래스들 (isinstance용 튜플)
+        self.target_classes = tuple(target_classes)
 
     def determine(self, e, env) -> bool:
         if e.hunger_ratio >= config.HUNGER_THRESHOLD:
             return False
         target = env.nearest_animal(
             e.location, e.detection_range,
-            lambda a: a.species in ("cheetah", "lion") and a.food_store > 0.0,
+            lambda a: isinstance(a, self.target_classes) and a.food_store > 0.0,
         )
         e._steal_target = target
         return target is not None
@@ -56,8 +60,6 @@ class Hyena(Animal):
     base_speed = 2.3
     size = 1.5
     detection_range = 8.0
-    prey = ("zebra", "rabbit")
-    predators = ("lion",)   # 사자를 보면 도망친다
 
     def hunt_speed_mult(self, target, env) -> float:
         # dash(skill): 스태미나가 있는 동안 한 번에 더 많은 타일 이동
@@ -67,4 +69,10 @@ class Hyena(Animal):
         return 1.0
 
     def build_behaviors(self) -> list:
-        return [ProduceDung(), Flee(), SeekWater(), StealFood(), Scavenge(), Hunt(), Breed(), Wander()]
+        from lion import Lion
+        from cheetah import Cheetah
+        from zebra import Zebra
+        from rabbit import Rabbit
+        return [ProduceDung(), Flee(target_classes=[Lion]), SeekWater(),
+                StealFood(target_classes=[Cheetah, Lion]), Scavenge(),
+                Hunt(target_classes=[Zebra, Rabbit]), Breed(), Wander()]

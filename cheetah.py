@@ -11,7 +11,6 @@ class Cheetah(Animal):
     base_speed = 2.6
     size = 1.2
     detection_range = 8.0
-    prey = ("rabbit",)
 
     def hunt_speed_mult(self, target, env) -> float:
         # sprint(skill): 스태미나가 있는 동안 속도 폭증, 소진되면 추격 실패
@@ -21,4 +20,12 @@ class Cheetah(Animal):
         return 0.8
 
     def build_behaviors(self) -> list:
-        return [ProduceDung(), SeekWater(), Hunt(), Breed(), Wander()]
+        from rabbit import Rabbit
+
+        return [
+            ProduceDung(),
+            SeekWater(),
+            Hunt(target_classes=[Rabbit]),
+            Breed(),
+            Wander(),
+        ]
