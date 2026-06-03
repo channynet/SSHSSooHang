@@ -12,3 +12,7 @@ class Behavior(abc.ABC):
 
     @abc.abstractmethod
     def act(self): ...
+
+    def act_twice(self):
+        self.act()
+        self.act()
