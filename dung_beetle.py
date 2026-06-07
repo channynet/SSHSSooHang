@@ -64,4 +64,12 @@ class DungBeetle(Animal):
 
     def build_behaviors(self) -> list:
         from elephant import Elephant
-        return [Flee(target_classes=[Elephant]), SeekWater(), EatDung(), RollDung(), Breed(), Wander()]
+
+        return [
+            Flee(target_classes=[Elephant]),
+            SeekWater(),
+            EatDung(),
+            RollDung(),
+            Breed(),
+            Wander(),
+        ]

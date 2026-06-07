@@ -17,7 +17,8 @@ class StealFood(Behavior):
         if e.hunger_ratio >= config.HUNGER_THRESHOLD:
             return False
         target = env.nearest_animal(
-            e.location, e.detection_range,
+            e.location,
+            e.detection_range,
             lambda a: isinstance(a, self.target_classes) and a.food_store > 0.0,
         )
         e._steal_target = target
@@ -64,7 +65,9 @@ class Hyena(Animal):
     def hunt_speed_mult(self, target, env) -> float:
         # dash(skill): 스태미나가 있는 동안 한 번에 더 많은 타일 이동
         if self.stamina > 15.0:
-            self.stamina = max(0.0, self.stamina - config.SPRINT_STAMINA_COST * 0.7 * env._dt)
+            self.stamina = max(
+                0.0, self.stamina - config.SPRINT_STAMINA_COST * 0.7 * env._dt
+            )
             return 1.9
         return 1.0
 
@@ -73,6 +76,14 @@ class Hyena(Animal):
         from cheetah import Cheetah
         from zebra import Zebra
         from rabbit import Rabbit
-        return [ProduceDung(), Flee(target_classes=[Lion]), SeekWater(),
-                StealFood(target_classes=[Cheetah, Lion]), Scavenge(),
-                Hunt(target_classes=[Zebra, Rabbit]), Breed(), Wander()]
+
+        return [
+            ProduceDung(),
+            Flee(target_classes=[Lion]),
+            SeekWater(),
+            StealFood(target_classes=[Cheetah, Lion]),
+            Scavenge(),
+            Hunt(target_classes=[Zebra, Rabbit]),
+            Breed(),
+            Wander(),
+        ]

@@ -7,7 +7,7 @@ from behaviors import ProduceDung, Hunt, SeekWater, Breed, Wander
 class Eagle(Animal):
     species = "eagle"
     color = (90, 70, 50)
-    base_speed = 3.6        # 비행: 타일 간 빠르게 이동
+    base_speed = 3.6  # 비행: 타일 간 빠르게 이동
     size = 1.0
     detection_range = 10.0  # 비행 중 넓은 시야
     fly = True
@@ -23,4 +23,11 @@ class Eagle(Animal):
 
     def build_behaviors(self) -> list:
         from rabbit import Rabbit
-        return [ProduceDung(), SeekWater(), Hunt(target_classes=[Rabbit]), Breed(), Wander()]
+
+        return [
+            ProduceDung(),
+            SeekWater(),
+            Hunt(target_classes=[Rabbit]),
+            Breed(),
+            Wander(),
+        ]

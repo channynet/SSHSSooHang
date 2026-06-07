@@ -22,8 +22,8 @@ class Env:
         self.water_tiles = [t for row in grid for t in row if t.kind == TileType.WATER]
         self.plant_tiles = [t for row in grid for t in row if t.kind == TileType.PLANT]
 
-        self.elapsed = 0.0          # 경과 시간(초)
-        self.collapsed = False      # 생태계 붕괴 여부
+        self.elapsed = 0.0  # 경과 시간(초)
+        self.collapsed = False  # 생태계 붕괴 여부
         self.collapse_reason = ""
         self._initial_species: set[str] = set()
 
@@ -130,9 +130,12 @@ class Env:
             if not animal.alive:
                 self._on_death(animal, natural=False)
 
-        # 4) 사체 부패
+        # 4) 사체: 각자의 행동(부패) 실행
+        self._dt = dt
         for body in list(self.dead_bodies):
-            body.time_decay(dt)
+            for behavior in body.behaviors():
+                if behavior.determine(body, self):
+                    behavior.act(body, self)
             if body.depleted:
                 self.dead_bodies.remove(body)
 
@@ -146,11 +149,15 @@ class Env:
             self.animals.remove(animal)
         # 자연사(굶주림/갈증)는 사체를 남긴다. 포식으로 먹힌 경우는 남기지 않는다.
         if natural:
-            self.dead_bodies.append(DeadBody(animal.location, animal.species, animal.size))
+            self.dead_bodies.append(
+                DeadBody(animal.location, animal.species, animal.size)
+            )
 
     def _check_extinction(self) -> None:
         for species, count in self.species_counts().items():
             if count == 0:
                 self.collapsed = True
-                self.collapse_reason = f"{species} 종이 멸종하여 먹이사슬이 붕괴했습니다."
+                self.collapse_reason = (
+                    f"{species} 종이 멸종하여 먹이사슬이 붕괴했습니다."
+                )
                 return

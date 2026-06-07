@@ -12,7 +12,7 @@ class Rabbit(Animal):
     base_speed = 2.2
     size = 0.4
     detection_range = 7.0
-    flee_speed_mult = 1.6   # 도망칠 때 빠름
+    flee_speed_mult = 1.6  # 도망칠 때 빠름
 
     def on_capture_attempt(self, predator, env) -> bool:
         # jump(skill): 쿨다운이 차면 점프로 포획/짓밟기를 회피한다.
@@ -29,5 +29,12 @@ class Rabbit(Animal):
         from hyena import Hyena
         from lion import Lion
         from elephant import Elephant
-        return [ProduceDung(), Flee(target_classes=[Cheetah, Eagle, Hyena, Lion, Elephant]),
-                SeekWater(), SeekPlantFood(), Breed(), Wander()]
+
+        return [
+            ProduceDung(),
+            Flee(target_classes=[Cheetah, Eagle, Hyena, Lion, Elephant]),
+            SeekWater(),
+            SeekPlantFood(),
+            Breed(),
+            Wander(),
+        ]

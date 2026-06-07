@@ -19,7 +19,8 @@ class Roar(Behavior):
         if e.skill_timer > 0.0:
             return False
         e._roar_targets = env.animals_near(
-            e.location, e.detection_range,
+            e.location,
+            e.detection_range,
             lambda a: isinstance(a, self.target_classes),
         )
         return len(e._roar_targets) > 0
@@ -37,11 +38,18 @@ class Lion(Animal):
     base_speed = 2.4
     size = 3.0
     detection_range = 9.0
-    stealth_rate = 0.9     # ambush: 은폐율 (사냥감 회피 확률을 낮춤)
+    stealth_rate = 0.9  # ambush: 은폐율 (사냥감 회피 확률을 낮춤)
 
     def build_behaviors(self) -> list:
         from zebra import Zebra
         from hyena import Hyena
+
         # 얼룩말 사냥 + 하이에나 추격
-        return [ProduceDung(), SeekWater(), Hunt(target_classes=[Zebra, Hyena]),
-                Roar(target_classes=[Zebra, Hyena]), Breed(), Wander()]
+        return [
+            ProduceDung(),
+            SeekWater(),
+            Hunt(target_classes=[Zebra, Hyena]),
+            Roar(target_classes=[Zebra, Hyena]),
+            Breed(),
+            Wander(),
+        ]

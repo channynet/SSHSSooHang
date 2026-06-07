@@ -16,7 +16,8 @@ class Trample(Behavior):
 
     def determine(self, e, env) -> bool:
         victim = env.nearest_animal(
-            e.location, config.INTERACT_RADIUS,
+            e.location,
+            config.INTERACT_RADIUS,
             lambda a: isinstance(a, self.target_classes),
         )
         e._victim = victim
@@ -41,5 +42,12 @@ class Elephant(Animal):
     def build_behaviors(self) -> list:
         from dung_beetle import DungBeetle
         from rabbit import Rabbit
-        return [ProduceDung(), SeekWater(), Trample(target_classes=[DungBeetle, Rabbit]),
-                SeekPlantFood(), Breed(), Wander()]
+
+        return [
+            ProduceDung(),
+            SeekWater(),
+            Trample(target_classes=[DungBeetle, Rabbit]),
+            SeekPlantFood(),
+            Breed(),
+            Wander(),
+        ]
