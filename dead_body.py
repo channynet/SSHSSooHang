@@ -6,7 +6,7 @@ from geo import Point
 class Decay(Behavior):
     """시간이 지나면 사체가 부패한다."""
 
-    def determine(self, entity: "DeadBody", env) -> bool:
+    def should_run(self, entity: "DeadBody", env) -> bool:
         return True
 
     def act(self, entity: "DeadBody", env) -> None:

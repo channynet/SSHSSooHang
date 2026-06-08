@@ -8,7 +8,7 @@ from base import Behavior
 from geo import Point
 
 
-def _heading_target(e, env) -> Point:
+def _wander_target(e, env) -> Point:
     """완만하게 바뀌는 방향으로 배회 목표점을 만든다."""
     e._wander_t = getattr(e, "_wander_t", 0.0) + env._dt
     if not hasattr(e, "_wander_angle") or e._wander_t > 2.0:
@@ -23,7 +23,7 @@ def _heading_target(e, env) -> Point:
 class ProduceDung(Behavior):
     """모든 동물 공통: 주기적으로 현재 타일에 배설한다 (쇠똥구리의 먹이가 됨)."""
 
-    def determine(self, e, env) -> bool:
+    def should_run(self, e, env) -> bool:
         return e.dung_timer >= config.DUNG_PRODUCE_SEC
 
     def act(self, e, env) -> None:
@@ -37,7 +37,7 @@ class Flee(Behavior):
         # 두려워하는 포식자 Animal 하위 클래스들 (isinstance용 튜플)
         self.target_classes = tuple(target_classes)
 
-    def determine(self, e, env) -> bool:
+    def should_run(self, e, env) -> bool:
         if not self.target_classes:
             return False
         threat = env.nearest_animal(
@@ -56,8 +56,8 @@ class Flee(Behavior):
 class SeekWater(Behavior):
     """목이 마르면 가장 가까운 물 타일로 이동해 물을 마신다."""
 
-    def determine(self, e, env) -> bool:
-        return e.thirst_ratio < config.THIRST_THRESHOLD and bool(env.water_tiles)
+    def should_run(self, e, env) -> bool:
+        return e.water_ratio < config.THIRST_THRESHOLD and bool(env.water_tiles)
 
     def act(self, e, env) -> None:
         tile = env.nearest_tile(e.location, env.water_tiles)
@@ -75,8 +75,8 @@ class SeekWater(Behavior):
 class SeekPlantFood(Behavior):
     """초식동물이 배고프면 식물 타일로 이동해 식물을 먹는다."""
 
-    def determine(self, e, env) -> bool:
-        return e.hunger_ratio < config.HUNGER_THRESHOLD and bool(env.plant_tiles)
+    def should_run(self, e, env) -> bool:
+        return e.fullness_ratio < config.HUNGER_THRESHOLD and bool(env.plant_tiles)
 
     def act(self, e, env) -> None:
         tile = env.nearest_tile(e.location, env.plant_tiles)
@@ -95,8 +95,8 @@ class Hunt(Behavior):
         # 사냥 대상 Animal 하위 클래스들 (isinstance용 튜플)
         self.target_classes = tuple(target_classes)
 
-    def determine(self, e, env) -> bool:
-        if not self.target_classes or e.hunger_ratio >= config.HUNGER_THRESHOLD:
+    def should_run(self, e, env) -> bool:
+        if not self.target_classes or e.fullness_ratio >= config.HUNGER_THRESHOLD:
             return False
         target = env.nearest_animal(
             e.location,
@@ -120,8 +120,8 @@ class Hunt(Behavior):
     def capture_succeeds(self, e, target, env) -> bool:
         """사냥감의 회피 능력(점프/은폐 등)을 반영. 기본은 항상 성공."""
         return (
-            target.on_capture_attempt(e, env)
-            if hasattr(target, "on_capture_attempt")
+            target.is_caught_by(e, env)
+            if hasattr(target, "is_caught_by")
             else True
         )
 
@@ -129,7 +129,7 @@ class Hunt(Behavior):
 class Breed(Behavior):
     """잘 먹은 상태에서 같은 종의 다른 성별 개체가 가까이 있으면 번식한다."""
 
-    def determine(self, e, env) -> bool:
+    def should_run(self, e, env) -> bool:
         if not e.can_breed():
             return False
         partner = env.nearest_animal(
@@ -148,8 +148,8 @@ class Breed(Behavior):
 class Wander(Behavior):
     """할 일이 없을 때의 기본 배회 (가장 낮은 우선순위)."""
 
-    def determine(self, e, env) -> bool:
+    def should_run(self, e, env) -> bool:
         return True
 
     def act(self, e, env) -> None:
-        e.step_toward(_heading_target(e, env), env, env._dt, 0.5)
+        e.step_toward(_wander_target(e, env), env, env._dt, 0.5)

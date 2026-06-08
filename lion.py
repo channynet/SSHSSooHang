@@ -15,7 +15,7 @@ class Roar(Behavior):
         # 포효가 영향을 줄 사냥감 Animal 하위 클래스들 (isinstance용 튜플)
         self.target_classes = tuple(target_classes)
 
-    def determine(self, e, env) -> bool:
+    def should_run(self, e, env) -> bool:
         if e.skill_timer > 0.0:
             return False
         e._roar_targets = env.animals_near(

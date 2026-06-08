@@ -13,8 +13,8 @@ class StealFood(Behavior):
         # 비축 식량을 노릴 Animal 하위 클래스들 (isinstance용 튜플)
         self.target_classes = tuple(target_classes)
 
-    def determine(self, e, env) -> bool:
-        if e.hunger_ratio >= config.HUNGER_THRESHOLD:
+    def should_run(self, e, env) -> bool:
+        if e.fullness_ratio >= config.HUNGER_THRESHOLD:
             return False
         target = env.nearest_animal(
             e.location,
@@ -38,8 +38,8 @@ class StealFood(Behavior):
 class Scavenge(Behavior):
     """사체를 먹는다 (eat_dead_body)."""
 
-    def determine(self, e, env) -> bool:
-        if e.hunger_ratio >= config.HUNGER_THRESHOLD:
+    def should_run(self, e, env) -> bool:
+        if e.fullness_ratio >= config.HUNGER_THRESHOLD:
             return False
         body = env.nearest_dead_body(e.location, e.detection_range)
         e._body = body

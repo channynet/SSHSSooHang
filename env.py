@@ -121,7 +121,7 @@ class Env:
                 continue
             self._dt = dt  # 현재 프레임 dt를 행동에서 참조
             for behavior in animal.behaviors():
-                if behavior.determine(animal, self):
+                if behavior.should_run(animal, self):
                     behavior.act(animal, self)
                     break
 
@@ -134,7 +134,7 @@ class Env:
         self._dt = dt
         for body in list(self.dead_bodies):
             for behavior in body.behaviors():
-                if behavior.determine(body, self):
+                if behavior.should_run(body, self):
                     behavior.act(body, self)
             if body.depleted:
                 self.dead_bodies.remove(body)

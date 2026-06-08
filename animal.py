@@ -62,11 +62,11 @@ class Animal(Entity):
 
     # --- 비율 헬퍼 ---
     @property
-    def thirst_ratio(self) -> float:
+    def water_ratio(self) -> float:
         return self.body_water / self.max_body_water
 
     @property
-    def hunger_ratio(self) -> float:
+    def fullness_ratio(self) -> float:
         return self.fullness / self.max_fullness
 
     # --- 기본 동작 ---
@@ -114,8 +114,8 @@ class Animal(Entity):
     def store_food(self, amount: float) -> None:
         self.food_store += amount
 
-    def on_capture_attempt(self, predator: "Animal", env) -> bool:
-        """포식자가 잡으려 할 때 회피 여부. True면 포획 성공. 종별로 재정의."""
+    def is_caught_by(self, predator: "Animal", env) -> bool:
+        """포식자에게 잡히는지 여부. True면 잡힘(포획 성공), False면 회피. 종별로 재정의."""
         return True
 
     def produce_dung(self, env) -> None:
@@ -124,7 +124,7 @@ class Animal(Entity):
         tile.dung += config.DUNG_AMOUNT
 
     def can_breed(self) -> bool:
-        return self.alive and self.breed_cooldown <= 0.0 and self.hunger_ratio >= config.BREED_THRESHOLD
+        return self.alive and self.breed_cooldown <= 0.0 and self.fullness_ratio >= config.BREED_THRESHOLD
 
     def breed_with(self, other: "Animal", env) -> None:
         self.breed_cooldown = config.BREED_COOLDOWN

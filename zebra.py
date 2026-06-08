@@ -14,7 +14,7 @@ class Zebra(Animal):
     detection_range = 7.0
     flee_speed_mult = 1.3
 
-    def on_capture_attempt(self, predator, env) -> bool:
+    def is_caught_by(self, predator, env) -> bool:
         # camouflage(passive): 줄무늬로 일정 확률로 포획을 회피한다.
         # 단, 사자의 ambush(은폐) 앞에서는 회피 확률이 크게 낮아진다.
         from lion import Lion

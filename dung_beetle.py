@@ -9,7 +9,7 @@ from behaviors import Flee, SeekWater, Breed, Wander
 class RollDung(Behavior):
     """배설물을 찾아 공을 굴린다 (ball_size가 점점 커짐)."""
 
-    def determine(self, e, env) -> bool:
+    def should_run(self, e, env) -> bool:
         if e.ball_size >= config.DUNG_BALL_EAT_SIZE:
             return False
         tile = env.nearest_dung_tile(e.location, e.detection_range)
@@ -27,7 +27,7 @@ class RollDung(Behavior):
 class EatDung(Behavior):
     """공 크기가 일정 수준 이상이면 섭취한다."""
 
-    def determine(self, e, env) -> bool:
+    def should_run(self, e, env) -> bool:
         return e.is_rolling and e.ball_size >= config.DUNG_BALL_EAT_SIZE
 
     def act(self, e, env) -> None:
