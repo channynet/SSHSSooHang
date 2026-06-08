@@ -14,7 +14,7 @@ class Trample(Behavior):
         # 짓밟을 Animal 하위 클래스들 (isinstance용 튜플)
         self.target_classes = tuple(target_classes)
 
-    def determine(self, e, env) -> bool:
+    def should_run(self, e, env) -> bool:
         victim = env.nearest_animal(
             e.location,
             config.INTERACT_RADIUS,
@@ -25,7 +25,7 @@ class Trample(Behavior):
 
     def act(self, e, env) -> None:
         v = e._victim
-        if not v.on_capture_attempt(e, env):
+        if not v.is_caught_by(e, env):
             return  # 회피 성공
         v.alive = False
         env.dead_bodies.append(DeadBody(v.location, v.species, v.size))

@@ -41,11 +41,11 @@ when to act are separate `Behavior` objects evaluated each frame.
   spatial helpers (`tile_at`, `animals_near`, `nearest_tile`, `nearest_dung_tile`,
   `nearest_dead_body`, `clamp`). `update` stashes the current `dt` on `env._dt` so behaviors
   can read it.
-- `base.py` — abstract `Entity` (`behaviors()`) and `Behavior` (`determine(entity, env)` →
+- `base.py` — abstract `Entity` (`behaviors()`) and `Behavior` (`should_run(entity, env)` →
   `act(entity, env)`).
 - `animal.py` — `Animal(Entity)` base: shared attributes (speed, body_water, fullness,
   stamina, detection_range, gender, ...) and low-level methods (`step_toward`/`step_away`,
-  `drink`, `eat_plant`, `eat_prey`, `produce_dung`, `breed_with`, `on_capture_attempt`).
+  `drink`, `eat_plant`, `eat_prey`, `produce_dung`, `breed_with`, `is_caught_by`).
   `tick()` applies per-second decay and triggers death at 0 water/fullness. Subclasses set
   class-level defaults (species, color, base_speed, prey, predators, ...) and implement
   `build_behaviors()`.
@@ -60,7 +60,7 @@ when to act are separate `Behavior` objects evaluated each frame.
 ### Behavior ordering is load-bearing
 
 `build_behaviors()` returns behaviors in **priority order**; `env.update` runs only the *first*
-one whose `determine()` is True. The established convention is:
+one whose `should_run()` is True. The established convention is:
 
 ```
 ProduceDung → Flee → SeekWater (survival) → feeding (Hunt/SeekPlantFood/RollDung/Steal/...) → Breed → Wander
@@ -78,7 +78,7 @@ and adds its unique skill as a `Behavior` or an overridden hook:
 
 - Skills as speed multipliers: override `hunt_speed_mult(target, env)` (cheetah sprint,
   hyena dash, eagle dive) — drain `stamina` there if the skill is stamina-gated.
-- Evasion: override `on_capture_attempt(predator, env)` to return False to dodge (rabbit jump,
+- Evasion: override `is_caught_by(predator, env)` to return False to dodge (rabbit jump,
   zebra camouflage). `Hunt`/`Trample` call it before killing.
 - Cross-species interactions live in the predator/actor's behavior (e.g. `StealFood`,
   `Scavenge` in `hyena.py`, `Trample` in `elephant.py`), keyed off `species` name strings in

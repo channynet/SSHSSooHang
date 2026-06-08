@@ -15,10 +15,10 @@ class Weather:
     def is_rainy(self) -> bool:
         return self.state == Weather.RAINY
 
-    def sunny(self) -> None:
+    def set_sunny(self) -> None:
         self.state = Weather.SUNNY
 
-    def rain(self) -> None:
+    def set_rainy(self) -> None:
         self.state = Weather.RAINY
 
     def update(self, env, dt_sec: float) -> None:
@@ -26,7 +26,7 @@ class Weather:
         self._timer += dt_sec
         if self._timer >= config.WEATHER_SWITCH_SEC:
             self._timer = 0.0
-            self.sunny() if self.is_rainy else self.rain()
+            self.set_sunny() if self.is_rainy else self.set_rainy()
 
         # 물 타일에 날씨 효과 적용
         for tile in env.water_tiles:

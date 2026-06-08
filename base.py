@@ -9,10 +9,10 @@ class Entity(abc.ABC):
 
 
 class Behavior(abc.ABC):
-    """하나의 의사결정 단위. determine()이 참이면 act()가 실행된다."""
+    """하나의 의사결정 단위. should_run()이 참이면 act()가 실행된다."""
 
     @abc.abstractmethod
-    def determine(self, entity: "Entity", env) -> bool:
+    def should_run(self, entity: "Entity", env) -> bool:
         """이번 프레임에 이 행동을 실행할 조건인지 판단."""
         ...
 
