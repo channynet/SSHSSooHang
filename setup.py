@@ -18,8 +18,8 @@ from zebra import Zebra
 
 # 종별 초기 개체 수 (먹이사슬 균형용)
 POPULATION = {
-    Zebra: 12,
-    Rabbit: 12,  # 50x34 그리드에서 2분 내 붕괴 보장용으로 축소 (16→12)
+    Zebra: 14,
+    Rabbit: 24,  # 포식 강화·번식 쿨다운↑에 맞춰 ~2분 붕괴하도록 버퍼 증량
     Elephant: 4,
     DungBeetle: 8,
     Lion: 3,

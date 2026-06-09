@@ -40,6 +40,9 @@ class Lion(Animal):
     detection_range = 9.0
     stealth_rate = 0.9  # ambush: 은폐율 (사냥감 회피 확률을 낮춤)
 
+    def hunt_speed_mult(self, target, env) -> float:
+        return 1.35
+
     def build_behaviors(self) -> list:
         from zebra import Zebra
         from hyena import Hyena

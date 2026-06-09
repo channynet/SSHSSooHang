@@ -4,6 +4,18 @@ from tile import Tile, TileType
 from weather import Weather
 from dead_body import DeadBody
 
+# 멸종 메시지용 종 한글 이름
+SPECIES_KOR = {
+    "zebra": "얼룩말",
+    "rabbit": "토끼",
+    "elephant": "코끼리",
+    "dung_beetle": "쇠똥구리",
+    "lion": "사자",
+    "hyena": "하이에나",
+    "cheetah": "치타",
+    "eagle": "독수리",
+}
+
 
 class Env:
     """생태계 월드. 타일 그리드, 동물, 사체, 날씨를 보유하고 매 프레임 갱신한다."""
@@ -79,14 +91,31 @@ class Env:
                 best, best_d = t, d
         return best
 
-    def nearest_dung_tile(self, origin: Point, radius: float):
+    def nearest_dung_tile(self, origin: Point, radius: float, claimer=None):
+        # claimer(쇠똥구리)가 주어지면, 각 똥은 '가장 가까운 쇠똥구리'에게만 할당한다.
+        # 즉 그 똥에 더 가까운 다른 쇠똥구리가 있으면 양보해서, 여러 마리가 같은
+        # 똥 한 곳으로 몰리지 않고 흩어져 가까운 똥을 각자 맡도록 한다.
+        rivals = ()
+        if claimer is not None:
+            rivals = [
+                a
+                for a in self.animals
+                if a.alive
+                and a is not claimer
+                and getattr(a, "ball_size", None) is not None
+                and a.ball_size < config.DUNG_BALL_EAT_SIZE
+            ]
         best, best_d = None, radius
         for row in self.grid:
             for t in row:
-                if t.has_dung():
-                    d = t.center.distance_to(origin)
-                    if d <= best_d:
-                        best, best_d = t, d
+                if not t.has_dung():
+                    continue
+                d = t.center.distance_to(origin)
+                if d > best_d:
+                    continue
+                if rivals and any(r.location.distance_to(t.center) < d for r in rivals):
+                    continue  # 더 가까운 쇠똥구리가 있으니 양보
+                best, best_d = t, d
         return best
 
     def nearest_dead_body(self, origin: Point, radius: float):
@@ -157,7 +186,8 @@ class Env:
         for species, count in self.species_counts().items():
             if count == 0:
                 self.collapsed = True
+                name = SPECIES_KOR.get(species, species)
                 self.collapse_reason = (
-                    f"{species} 종이 멸종하여 먹이사슬이 붕괴했습니다."
+                    f"{name} 종이 멸종하여 먹이사슬이 붕괴했습니다."
                 )
                 return

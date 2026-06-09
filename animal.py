@@ -124,13 +124,31 @@ class Animal(Entity):
         tile.dung += config.DUNG_AMOUNT
 
     def can_breed(self) -> bool:
-        return self.alive and self.breed_cooldown <= 0.0 and self.fullness_ratio >= config.BREED_THRESHOLD
+        threshold = getattr(self, "breed_threshold", config.BREED_THRESHOLD)
+        return self.alive and self.breed_cooldown <= 0.0 and self.fullness_ratio >= threshold
 
     def breed_with(self, other: "Animal", env) -> None:
-        self.breed_cooldown = config.BREED_COOLDOWN
-        other.breed_cooldown = config.BREED_COOLDOWN
+        self.breed_cooldown = getattr(self, "breed_cooldown_sec", config.BREED_COOLDOWN)
+        other.breed_cooldown = getattr(other, "breed_cooldown_sec", config.BREED_COOLDOWN)
         self.fullness *= 0.6
         other.fullness *= 0.6
-        offset = Point(random.uniform(-0.8, 0.8), random.uniform(-0.8, 0.8)) - Point(0, 0)
-        child = type(self)(env.clamp(self.location + offset))
-        env.spawn(child)
+        litter_size = getattr(self, "litter_size", 1)
+        extra_litter_chance = getattr(self, "extra_litter_chance", 0.0)
+        if random.random() < extra_litter_chance:
+            litter_size += 1
+        children = []
+        for _ in range(litter_size):
+            offset = Point(random.uniform(-0.8, 0.8), random.uniform(-0.8, 0.8)) - Point(0, 0)
+            child = type(self)(env.clamp(self.location + offset))
+            env.spawn(child)
+            children.append(child)
+        species_count = sum(
+            1 for animal in env.animals if animal.alive and animal.species == self.species
+        )
+        child_genders = ",".join(child.gender for child in children)
+        print(
+            f"[{env.elapsed:6.1f}s] 번식: {self.species} "
+            f"{self.gender}+{other.gender} -> 새끼 {child_genders} "
+            f"(총 {species_count}마리)",
+            flush=True,
+        )

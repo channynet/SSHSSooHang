@@ -96,11 +96,17 @@ class Hunt(Behavior):
         self.target_classes = tuple(target_classes)
 
     def should_run(self, e, env) -> bool:
-        if not self.target_classes or e.fullness_ratio >= config.HUNGER_THRESHOLD:
+        hunt_threshold = getattr(
+            e, "hunt_fullness_threshold", config.HUNT_FULLNESS_THRESHOLD
+        )
+        if not self.target_classes or e.fullness_ratio >= hunt_threshold:
             return False
+        search_radius = e.detection_range * getattr(
+            e, "hunt_detection_mult", config.HUNT_DETECTION_MULT
+        )
         target = env.nearest_animal(
             e.location,
-            e.detection_range,
+            search_radius,
             lambda a: isinstance(a, self.target_classes) and not a.is_flying,
         )
         e._target = target
@@ -111,11 +117,22 @@ class Hunt(Behavior):
         if not target.alive:
             return
         mult = e.hunt_speed_mult(target, env) if hasattr(e, "hunt_speed_mult") else 1.0
+        mult *= getattr(e, "hunt_chase_speed_mult", config.HUNT_CHASE_SPEED_MULT)
+        aim = target.location
+        last_target = getattr(e, "_hunt_last_target", None)
+        last_location = getattr(e, "_hunt_last_target_location", None)
+        if last_target is target and last_location is not None:
+            target_step = target.location - last_location
+            if target_step.length() > 1e-6:
+                lead_mult = getattr(e, "hunt_lead_mult", config.HUNT_LEAD_MULT)
+                aim = env.clamp(target.location + target_step * lead_mult)
+        e._hunt_last_target = target
+        e._hunt_last_target_location = target.location
         if e.location.distance_to(target.location) <= config.CAPTURE_RADIUS:
             if self.capture_succeeds(e, target, env):
                 e.eat_prey(target)
         else:
-            e.step_toward(target.location, env, env._dt, mult)
+            e.step_toward(aim, env, env._dt, mult)
 
     def capture_succeeds(self, e, target, env) -> bool:
         """사냥감의 회피 능력(점프/은폐 등)을 반영. 기본은 항상 성공."""
