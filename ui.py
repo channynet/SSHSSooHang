@@ -66,7 +66,7 @@ def init(env) -> None:
     w = env.width * config.TILE_PX
     h = env.height * config.TILE_PX + config.HUD_H
     _screen = pygame.display.set_mode((w, h), pygame.SCALED | pygame.FULLSCREEN)
-    pygame.display.set_caption("세렝게티의 눈물  (F/F11: 전체화면 전환)")
+    pygame.display.set_caption("세렝게티의 눈물  (Space/P: 일시정지, ESC: 종료, F/F11: 전체화면)")
     # malgungothic(맑은 고딕)이 있으면 한글이 정상 출력된다. 없으면 다음 후보로 폴백.
     _font = pygame.font.SysFont("malgungothic,applegothic,arialunicodems", 16)
     _big_font = pygame.font.SysFont("malgungothic,applegothic,arialunicodems", 34)
@@ -74,17 +74,19 @@ def init(env) -> None:
     _load_assets()
 
 
-def draw(env) -> bool:
-    """한 프레임 렌더. 계속 실행하면 True, 종료하면 False 반환."""
+def draw(env, paused: bool = False) -> tuple[bool, bool]:
+    """한 프레임 렌더. (계속 실행 여부, 일시정지 여부)를 반환."""
     if HEADLESS:
-        return _draw_headless(env)
+        return _draw_headless(env), paused
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            return False
+            return False, paused
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
-                return False
+                return False, paused
+            if event.key in (pygame.K_SPACE, pygame.K_p):
+                paused = not paused
             if event.key in (pygame.K_f, pygame.K_F11):
                 pygame.display.toggle_fullscreen()
 
@@ -92,12 +94,14 @@ def draw(env) -> bool:
     _draw_dead_bodies(env)
     _draw_animals(env)
     _draw_hud(env)
+    if paused and not env.collapsed:
+        _draw_paused()
     if env.collapsed:
         _draw_collapse(env)
 
     pygame.display.flip()
     _clock.tick(60)
-    return True
+    return True, paused
 
 
 def _px(coord: float) -> int:
@@ -234,6 +238,15 @@ def _draw_collapse(env) -> None:
     )
 
 
+def _draw_paused() -> None:
+    overlay = pygame.Surface(_screen.get_size())
+    overlay.set_alpha(120)
+    overlay.fill((0, 0, 0))
+    _screen.blit(overlay, (0, 0))
+    msg = _big_font.render("일시정지", True, (245, 245, 245))
+    _screen.blit(msg, msg.get_rect(center=_screen.get_rect().center))
+
+
 def _blit(text, x, y, color) -> None:
     _screen.blit(_font.render(text, True, color), (x, y))
 
@@ -253,8 +266,11 @@ def _draw_headless(env) -> bool:
     return True
 
 
-def finish(env) -> None:
+def finish(env, keep_open: bool = True) -> None:
     if HEADLESS:
+        return
+    if not keep_open:
+        pygame.quit()
         return
     # 창이 닫힐 때까지 마지막 화면 유지
     while True:

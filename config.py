@@ -15,6 +15,7 @@ STAMINA_REGEN = 12.0  # stamina 매초 회복량
 DRINK_AMOUNT = 45.0  # 물 한 번 마실 때 body_water 회복
 EAT_PLANT_AMOUNT = 35.0  # 식물 섭취 시 fullness 회복
 MEAT_PER_SIZE = 60.0  # 사냥감 size 1당 얻는 fullness
+PREDATOR_STORE_RATIO = 0.25  # 사냥 후 남은 고기 중 포식자가 비축하는 비율
 
 # --- 행동 임계값 ---
 THIRST_THRESHOLD = 0.45  # body_water 비율이 이 값 미만이면 물을 찾음

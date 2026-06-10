@@ -176,10 +176,15 @@ class Env:
             del self.entity_loc[animal]
         if animal in self.animals:
             self.animals.remove(animal)
-        # 자연사(굶주림/갈증)는 사체를 남긴다. 포식으로 먹힌 경우는 남기지 않는다.
-        if natural:
+        body_food = (
+            config.MEAT_PER_SIZE * animal.size
+            if natural
+            else getattr(animal, "_dead_body_food", 0.0)
+        )
+        body_food = 0.0 if body_food is None else body_food
+        if body_food > 0.0:
             self.dead_bodies.append(
-                DeadBody(animal.location, animal.species, animal.size)
+                DeadBody(animal.location, animal.species, animal.size, body_food)
             )
 
     def _check_extinction(self) -> None:

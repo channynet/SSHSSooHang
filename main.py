@@ -8,11 +8,13 @@ def main() -> None:
     ui.init(env)
 
     running = True
+    paused = True
     while running:
-        env.update(config.MS_PER_FRAME)
-        running = ui.draw(env)
+        running, paused = ui.draw(env, paused)
+        if running and not paused:
+            env.update(config.MS_PER_FRAME)
 
-    ui.finish(env)
+    ui.finish(env, keep_open=env.collapsed)
     if env.collapsed:
         print(env.collapse_reason)
 

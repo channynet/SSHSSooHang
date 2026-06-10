@@ -20,11 +20,13 @@ class DeadBody(Entity):
     하이에나 등 청소동물(scavenger)의 먹이가 된다.
     """
 
-    def __init__(self, location: Point, species: str, size: float):
+    def __init__(
+        self, location: Point, species: str, size: float, food: float | None = None
+    ):
         self.location = location
         self.species = species
         self.size = size
-        self.food = config.MEAT_PER_SIZE * size  # 남은 영양가
+        self.food = config.MEAT_PER_SIZE * size if food is None else food
         self.decay = config.DEAD_BODY_DECAY  # 남은 부패 시간(초)
         self._behaviors = [Decay()]
 

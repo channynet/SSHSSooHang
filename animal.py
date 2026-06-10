@@ -38,6 +38,7 @@ class Animal(Entity):
         self.dung_timer = random.uniform(0.0, config.DUNG_PRODUCE_SEC)
         self.skill_timer = 0.0      # 스킬 쿨다운 등 종별 용도
         self.food_store = 0.0       # 비축 식량 (cheetah/lion → hyena가 탈취)
+        self._dead_body_food: float | None = None
         self._behaviors = self.build_behaviors()
 
     # --- 서브클래스가 행동 목록을 구성 ---
@@ -102,13 +103,17 @@ class Animal(Entity):
 
     def eat_prey(self, prey: "Animal") -> None:
         gain = config.MEAT_PER_SIZE * prey.size
-        before = self.fullness
-        self.fullness = min(self.max_fullness, self.fullness + gain)
-        self.body_water = min(self.max_body_water, self.body_water + gain * 0.3)
-        # 다 못 먹은 잉여는 비축한다 (store_food).
-        leftover = gain - (self.fullness - before)
+        hunger = max(0.0, self.max_fullness - self.fullness)
+        eaten = min(gain, hunger)
+        self.fullness = min(self.max_fullness, self.fullness + eaten)
+        self.body_water = min(self.max_body_water, self.body_water + eaten * 0.3)
+        leftover = max(0.0, gain - eaten)
         if leftover > 0:
-            self.store_food(leftover)
+            stored = leftover * config.PREDATOR_STORE_RATIO
+            self.store_food(stored)
+            prey._dead_body_food = leftover - stored
+        else:
+            prey._dead_body_food = 0.0
         prey.alive = False
 
     def store_food(self, amount: float) -> None:
